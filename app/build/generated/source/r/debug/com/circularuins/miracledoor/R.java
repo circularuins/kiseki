@@ -108,7 +108,9 @@ public final class R {
         public static final int snow=0x7f020057;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a0007;
+        public static final int action_settings=0x7f0a0009;
+        public static final int btnBGM=0x7f0a0007;
+        public static final int btnCredit=0x7f0a0008;
         public static final int llKiseki=0x7f0a0003;
         public static final int miracleBtn=0x7f0a0005;
         public static final int nextBtn=0x7f0a0002;

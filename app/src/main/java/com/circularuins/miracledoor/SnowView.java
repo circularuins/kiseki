@@ -286,13 +286,31 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         for (int i = 0; i < credits.size(); i++) {
             credits.get(i).setThread(null); //字幕スレッドを停止
-            //credits.remove(i);
         }
-        credits = null; //字幕オブジェクトをクリア
+        credits.clear(); //字幕オブジェクトをクリア
 
         service = null;
 
         mp.stop(); //BGM停止
+        mp.release(); //インスタンス開放
+    }
+
+    //字幕のクリア
+    public void clearCredit() {
+        for (int i = 0; i < credits.size(); i++) {
+            credits.get(i).setThread(null); //字幕スレッドを停止
+        }
+        credits.clear(); //字幕オブジェクトをクリア
+    }
+
+    //BGMの再開
+    public void startBGM() {
+        mp.start();
+    }
+
+    //BGMの一時停止
+    public void stopBGM() {
+        mp.pause();
     }
 
     //SnowActivityのrunメソッド
