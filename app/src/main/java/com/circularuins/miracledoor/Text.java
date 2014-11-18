@@ -4,9 +4,9 @@ package com.circularuins.miracledoor;
  * Created by wake on 2014/11/18.
  */
 public class Text {
-    private String text;
-    private int color;
-    private float size;
+    private String text; //テキスト文字列
+    private int color; //テキストカラー
+    private float size; //フォントサイズ
 
     public Text(String text, int color, float size) {
         this.text = text;
