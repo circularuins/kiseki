@@ -149,6 +149,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         float x, y, dx, dy, r;
         credits = new ArrayList<Credits>();
         Random rnd = new Random();
+        //200粒の雪粒子を作製
         for (int i = 0; i < 200; i++) {
             x = (float)rnd.nextInt(getWidth()); //x座標をランダム設定
             y = (float)rnd.nextInt(getHeight()); //y座標をランダム設定
@@ -189,7 +190,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         //字幕配列への追加
         credits.add(new Credits(drawX, drawY, dx, dy, color, size, text, getHeight()));
         //クレジット数の上限を超えたら最初のものから削除
-        if(credits.size() > 45) {
+        if(credits.size() > 50) {
             credits.get(0).setThread(null);
             credits.remove(0);
         }
@@ -202,7 +203,6 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     public void onSensorChanged(SensorEvent event) {
         a_value = event.values.clone();
         if(a_value != null) {
-            Random rnd = new Random();
             //雪の加速度を変化させる
             for (int i = 0; i < snows.size(); i++) {
                 //各雪の加速度の取得
@@ -250,12 +250,12 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
                         pressText.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                //BGMの停止
+                                //BGMの一時停止
                                 /*
                                 画面切り替え時に停止するが、若干タイミングが遅いため、
-                                タッチイベント時に明示的に停止させる。
+                                タッチイベント時に明示的に一時停止させる。
                                 */
-                                mp.stop();
+                                mp.pause();
 
                                 //物語画面への切り替え
                                 Intent intent = new Intent(getContext(), GameActivity.class);
@@ -284,10 +284,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         snowThread = null; //雪スレッド停止
         snows.clear(); //雪オブジェクトをクリア
 
-        for (int i = 0; i < credits.size(); i++) {
-            credits.get(i).setThread(null); //字幕スレッドを停止
-        }
-        credits.clear(); //字幕オブジェクトをクリア
+        clearCredit(); //字幕をクリア
 
         service = null;
 
