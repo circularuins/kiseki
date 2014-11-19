@@ -1,7 +1,9 @@
 package com.circularuins.miracledoor;
 
 import android.app.Activity;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -161,6 +163,9 @@ public class GameActivity extends Activity {
     private ArrayList<Plot> plots = new ArrayList<Plot>();
     //BGM用
     private MediaPlayer mp;
+    //効果音用変数
+    private SoundPool sp;
+    private int spID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,10 +201,18 @@ public class GameActivity extends Activity {
         textView.setText(plots.get(seenCount).getTextArray()[textCount]);
         textCount++; //セリフを進める
 
+        //効果音の読み込み
+        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        spID = sp.load(GameActivity.this, R.raw.walk, 1);
+        button.setSoundEffectsEnabled(false); //ボタンのデフォルトクリック音をオフ
+
         //「奇跡の扉」ボタンアクション
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //効果音の再生
+                sp.play(spID, 0.5f, 1.0f, 0, 0, 1.0f);
+
                 //各上限値
                 final int PLOT_MAX = plots.size();
                 final int TEXT_MAX = plots.get(seenCount).getTextArray().length;
@@ -233,7 +246,8 @@ public class GameActivity extends Activity {
                                 mp.start();
                             }
                         } else {
-                            mp.stop();
+                            mp.stop(); //BGM停止
+                            sp.release(); //効果音開放
                             //オープニング画面に戻る
                             finish();
                         }

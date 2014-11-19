@@ -9,7 +9,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -32,6 +34,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Runnable, SensorEventListener {
     private MediaPlayer mp;
+    private SoundPool sp;
+    private int spID;
     private ScheduledExecutorService service;
     private SurfaceHolder holder;
     private Thread snowThread; //雪アニメーションのスレッド
@@ -232,6 +236,10 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         snowThread = new Thread(this);
         snowThread.start();
 
+        //効果音の読み込み
+        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        spID = sp.load(getContext(), R.raw.mapclear, 1);
+
         //『Press Start...』の点滅アニメーション
         pressText = (TextView)((Activity)getContext()).findViewById(R.id.pressText); //"Activity"のfindViewByIdを呼ぶ必要がある
         new Thread(new Runnable() {
@@ -247,6 +255,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
                         }
 
                         //『Press Start』テキストをクリックすると、物語画面へ切り替わる
+                        pressText.setSoundEffectsEnabled(false); //デフォルトクリック音をオフ
                         pressText.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -256,6 +265,9 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
                                 タッチイベント時に明示的に一時停止させる。
                                 */
                                 mp.pause();
+
+                                //効果音の再生
+                                sp.play(spID, 1.0f, 1.0f, 0, 0, 1.0f);
 
                                 //物語画面への切り替え
                                 Intent intent = new Intent(getContext(), GameActivity.class);
@@ -290,6 +302,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         mp.stop(); //BGM停止
         mp.release(); //インスタンス開放
+        sp.release(); //効果音開放
     }
 
     //字幕のクリア
