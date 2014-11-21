@@ -303,6 +303,8 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         mp.stop(); //BGM停止
         mp.release(); //インスタンス開放
         sp.release(); //効果音開放
+
+        manager.unregisterListener(this);
     }
 
     //字幕のクリア
