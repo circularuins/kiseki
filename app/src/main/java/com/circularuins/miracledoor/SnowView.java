@@ -122,8 +122,8 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         //速度,半径,テキストサイズをデバイス解像度に対応させるための値
-        width_ratio = (float)(getWidth() * 0.0008);
-        height_ratio = (float)(getHeight() * 0.0008);
+        width_ratio = (getWidth() / 1200f);
+        height_ratio = (getHeight() / 1200f);
 
         //雪の初期化
         float x, y, dx, dy, r;
@@ -192,7 +192,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         float dx = 0;
         float dy = (float)(rnd.nextInt(10) + 1) * height_ratio; //y軸加速度の初期値1~5
         int color = texts.get(num).getColor();
-        float size = 20 + rnd.nextFloat() * texts.get(num).getSize() * width_ratio;
+        float size = 20 * width_ratio + rnd.nextFloat() * texts.get(num).getSize() * width_ratio;
         String text = texts.get(num).getText();
         //字幕配列への追加
         credits.add(new Credits(drawX, drawY, dx, dy, color, size, text, getHeight()));

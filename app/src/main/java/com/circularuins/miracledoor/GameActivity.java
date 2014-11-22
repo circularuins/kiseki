@@ -273,8 +273,8 @@ public class GameActivity extends Activity {
         super.onWindowFocusChanged(hasFocus);
 
         //テキストサイズをデバイス解像度に対応させるための値
-        width_ratio = (float)(textView.getWidth() / 1200f);
-        height_ratio = (float)(textView.getHeight() / 1200f);
+        width_ratio = (textView.getWidth() / 1200f);
+        height_ratio = (textView.getHeight() / 1200f);
     }
 
     @Override
