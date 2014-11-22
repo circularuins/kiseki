@@ -44,7 +44,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     private Handler hdlr = new Handler(); //スレッド通信のためのハンドラ
     private SensorManager manager;
     private float[] a_value;
-    private ArrayList<Credits> credits; //字幕配列
+    private ArrayList<Credits> credits = new ArrayList<Credits>(); //字幕配列
     private ArrayList<Text> texts = new ArrayList<Text>();
 
 
@@ -68,11 +68,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         holder = this.getHolder();
         holder.addCallback(this);
 
-        //加速度センサー利用準備
-        manager = (SensorManager)((Activity)getContext()).getSystemService(Activity.SENSOR_SERVICE);
-        List<Sensor> a_sensors = manager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        manager.registerListener(SnowView.this, a_sensors.get(0), SensorManager.SENSOR_DELAY_FASTEST);
-
+        //TODO テキストサイズをデバイス対応させる　
         //字幕用テキストの初期化
         texts.add(new Text("大好き", Color.rgb(255, 20, 147), 60)); //deeppink
         texts.add(new Text("好き", Color.rgb(255,192,203), 50)); //pink
@@ -114,10 +110,10 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
             credits.get(i).draw(canvas);
         }
 
-        //Log.v("TEST", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         holder.unlockCanvasAndPost(canvas);
     }
 
+    //雪の座標計算
     public void startExecutor() {
         service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(new Runnable() {
@@ -151,8 +147,8 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     public void surfaceCreated(SurfaceHolder holder) {
         //雪の初期化
         float x, y, dx, dy, r;
-        credits = new ArrayList<Credits>();
         Random rnd = new Random();
+        //TODO 各速度と半径をデバイス対応させる
         //200粒の雪粒子を作製
         for (int i = 0; i < 200; i++) {
             x = (float)rnd.nextInt(getWidth()); //x座標をランダム設定
@@ -171,9 +167,10 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     }
 
+    //ビューが破棄された時に呼ばれる
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        stop();
+        stop(); //各リソースの停止と開放
     }
 
     //タッチで字幕を生成
@@ -194,7 +191,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         //字幕配列への追加
         credits.add(new Credits(drawX, drawY, dx, dy, color, size, text, getHeight()));
         //クレジット数の上限を超えたら最初のものから削除
-        if(credits.size() > 50) {
+        if(credits.size() > 60) {
             credits.get(0).setThread(null);
             credits.remove(0);
         }
@@ -202,7 +199,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         return super.onTouchEvent(event);
     }
 
-    //加速度が変化した時
+    //加速度が変化した時の雪の座標計算
     @Override
     public void onSensorChanged(SensorEvent event) {
         a_value = event.values.clone();
@@ -230,7 +227,7 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     }
 
-    //アニメーション・BGMの開始
+    //アニメーション・BGM・センサーの開始
     public void start() {
         //スレッドを作成し雪アニメーション開始
         snowThread = new Thread(this);
@@ -239,6 +236,11 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         //効果音の読み込み
         sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         spID = sp.load(getContext(), R.raw.mapclear, 1);
+
+        //加速度センサー利用準備
+        manager = (SensorManager)((Activity)getContext()).getSystemService(Activity.SENSOR_SERVICE);
+        List<Sensor> a_sensors = manager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+        manager.registerListener(SnowView.this, a_sensors.get(0), SensorManager.SENSOR_DELAY_FASTEST);
 
         //『Press Start...』の点滅アニメーション
         pressText = (TextView)((Activity)getContext()).findViewById(R.id.pressText); //"Activity"のfindViewByIdを呼ぶ必要がある
@@ -283,15 +285,9 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         mp = MediaPlayer.create(getContext(), R.raw.kiseki);
         mp.setLooping(true); //ループ再生
         mp.start();
-
-        /*try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-
-        }*/
     }
 
-    //アニメーション・BGMの停止
+    //リソースの停止と開放
     public void stop(){
         snowThread = null; //雪スレッド停止
         snows.clear(); //雪オブジェクトをクリア
@@ -304,10 +300,10 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         mp.release(); //インスタンス開放
         sp.release(); //効果音開放
 
-        manager.unregisterListener(this);
+        manager.unregisterListener(this); //センサーオブジェクトの開放
     }
 
-    //字幕のクリア
+    //字幕のクリア（KisekiActivityからも呼ばれる）
     public void clearCredit() {
         for (int i = 0; i < credits.size(); i++) {
             credits.get(i).setThread(null); //字幕スレッドを停止
@@ -315,12 +311,12 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
         credits.clear(); //字幕オブジェクトをクリア
     }
 
-    //BGMの再開
+    //BGMの再開（KisekiActivityからも呼ばれる）
     public void startBGM() {
         mp.start();
     }
 
-    //BGMの一時停止
+    //BGMの一時停止（KisekiActivityからも呼ばれる）
     public void stopBGM() {
         mp.pause();
     }

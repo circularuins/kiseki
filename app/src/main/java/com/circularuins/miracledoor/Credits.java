@@ -41,7 +41,7 @@ public class Credits implements Runnable {
         while (thread != null) {
             drawY += -dy;
             try {
-                Thread.sleep(1000/60);
+                Thread.sleep(1000/60); //60msec毎の描画
             } catch (Exception e) {
 
             }
