@@ -166,6 +166,13 @@ public class GameActivity extends Activity {
     //効果音用変数
     private SoundPool sp;
     private int spID;
+    //ウィジェット参照用
+    private ImageView imageView;
+    private TextView textView;
+    private Button button;
+    //テキストサイズをデバイス解像度に対応させるための値
+    float width_ratio;
+    float height_ratio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,10 +195,10 @@ public class GameActivity extends Activity {
         //BGMのセット
         plots.get(105).setBgmName("love"); //106シーン目にBGMをセット
 
-        //各参照の取得
-        final ImageView imageView = (ImageView)findViewById(R.id.seenView);
-        final TextView textView = (TextView)findViewById(R.id.protView);
-        final Button button = (Button)findViewById(R.id.nextBtn);
+        //各ウィジェット参照の取得
+        imageView = (ImageView)findViewById(R.id.seenView);
+        textView = (TextView)findViewById(R.id.protView);
+        button = (Button)findViewById(R.id.nextBtn);
 
         //最初の画面表示
         //画像の表示
@@ -212,6 +219,9 @@ public class GameActivity extends Activity {
             public void onClick(View v) {
                 //効果音の再生
                 sp.play(spID, 0.5f, 1.0f, 0, 0, 1.0f);
+
+                //テキストサイズを解像度によって調整
+                textView.setTextSize(22 * width_ratio);
 
                 //各上限値
                 final int PLOT_MAX = plots.size();
@@ -257,6 +267,15 @@ public class GameActivity extends Activity {
         });
     }
 
+    //onCreateの後に呼ばれるらしい？
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        //テキストサイズをデバイス解像度に対応させるための値
+        width_ratio = (float)(textView.getWidth() / 1200f);
+        height_ratio = (float)(textView.getHeight() / 1200f);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
