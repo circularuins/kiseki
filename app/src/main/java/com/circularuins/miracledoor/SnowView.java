@@ -46,6 +46,9 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float[] a_value;
     private ArrayList<Credits> credits = new ArrayList<Credits>(); //字幕配列
     private ArrayList<Text> texts = new ArrayList<Text>();
+    //速度,半径,テキストサイズをデバイス解像度に対応させるための値
+    private float width_ratio;
+    private float height_ratio;
 
 
     public SnowView(Context context) {
@@ -67,33 +70,6 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void initial() {
         holder = this.getHolder();
         holder.addCallback(this);
-
-        //TODO テキストサイズをデバイス対応させる　
-        //字幕用テキストの初期化
-        texts.add(new Text("大好き", Color.rgb(255, 20, 147), 60)); //deeppink
-        texts.add(new Text("好き", Color.rgb(255,192,203), 50)); //pink
-        int white = Color.argb(195, 255, 255, 255);
-        texts.add(new Text("ひとりぼっち", white, 30));
-        texts.add(new Text("信じてる", white, 30));
-        texts.add(new Text("気づいて欲しい", white, 30));
-        texts.add(new Text("沈黙", white, 30));
-        texts.add(new Text("いっしょにいたい", white, 30));
-        texts.add(new Text("優しい言葉", white, 30));
-        texts.add(new Text("好意", white, 30));
-        texts.add(new Text("思い上がり", white, 30));
-        texts.add(new Text("友達になって欲しい", white, 30));
-        texts.add(new Text("嫌われたくない", white, 30));
-        texts.add(new Text("見つめて欲しい", white, 30));
-        texts.add(new Text("気になるの", white, 30));
-        texts.add(new Text("眠れない", white, 30));
-        texts.add(new Text("不安", white, 30));
-        texts.add(new Text("思い過ごし？", white, 30));
-        texts.add(new Text("夢", white, 30));
-        texts.add(new Text("涙", white, 30));
-        texts.add(new Text("好きになって欲しい", white, 30));
-        texts.add(new Text("悲しいこと", white, 30));
-        texts.add(new Text("話をしたい", white, 30));
-        texts.add(new Text("素直な気持ち", white, 30));
     }
 
     //アニメーション描画関数
@@ -145,21 +121,51 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
     //ビューが表示された時に呼ばれる
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        //速度,半径,テキストサイズをデバイス解像度に対応させるための値
+        width_ratio = (float)(getWidth() * 0.0008);
+        height_ratio = (float)(getHeight() * 0.0008);
+
         //雪の初期化
         float x, y, dx, dy, r;
         Random rnd = new Random();
-        //TODO 各速度と半径をデバイス対応させる
         //200粒の雪粒子を作製
         for (int i = 0; i < 200; i++) {
             x = (float)rnd.nextInt(getWidth()); //x座標をランダム設定
             y = (float)rnd.nextInt(getHeight()); //y座標をランダム設定
-            dx = (float)(rnd.nextInt(4) - rnd.nextInt(4)); //x速度を-3~3でランダム設定
-            dy = (float)(rnd.nextInt(5) + 1); //y速度を1~5でランダム設定
-            r = (float)rnd.nextInt(6); //半径をランダム設定
+            dx = (float)(rnd.nextInt(4) - rnd.nextInt(4)) * width_ratio; //x速度を-3~3でランダム設定
+            dy = (float)(rnd.nextInt(5) + 1) * height_ratio; //y速度を1~5でランダム設定
+            r = (float)rnd.nextInt(6) * width_ratio; //半径をランダム設定
             snows.add(new Snow(x, y, dx, dy, Color.WHITE, r));
         }
 
-        start(); //開始
+        //字幕用テキストの初期化
+        texts.add(new Text("大好き", Color.rgb(255, 20, 147), 60)); //deeppink
+        texts.add(new Text("好き", Color.rgb(255,192,203), 50)); //pink
+        int white = Color.argb(195, 255, 255, 255);
+        texts.add(new Text("ひとりぼっち", white, 30));
+        texts.add(new Text("信じてる", white, 30));
+        texts.add(new Text("気づいて欲しい", white, 30));
+        texts.add(new Text("沈黙", white, 30));
+        texts.add(new Text("いっしょにいたい", white, 30));
+        texts.add(new Text("優しい言葉", white, 30));
+        texts.add(new Text("好意", white, 30));
+        texts.add(new Text("思い上がり", white, 30));
+        texts.add(new Text("友達になって欲しい", white, 30));
+        texts.add(new Text("嫌われたくない", white, 30));
+        texts.add(new Text("見つめて欲しい", white, 30));
+        texts.add(new Text("気になるの", white, 30));
+        texts.add(new Text("眠れない", white, 30));
+        texts.add(new Text("不安", white, 30));
+        texts.add(new Text("思い過ごし？", white, 30));
+        texts.add(new Text("夢", white, 30));
+        texts.add(new Text("涙", white, 30));
+        texts.add(new Text("好きになって欲しい", white, 30));
+        texts.add(new Text("悲しいこと", white, 30));
+        texts.add(new Text("話をしたい", white, 30));
+        texts.add(new Text("素直な気持ち", white, 30));
+
+
+        start(); //アニメーションとBGM開始
     }
 
     @Override
@@ -181,12 +187,12 @@ public class SnowView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         Random rnd = new Random();
         int num = rnd.nextInt(texts.size());
-        float drawX = event.getX() - 60; //テキストの描画開始x座標をずらす
+        float drawX = event.getX() - 60 * width_ratio; //テキストの描画開始x座標をずらす
         float drawY = event.getY();
         float dx = 0;
-        float dy = (float)(rnd.nextInt(10) + 1); //y軸加速度の初期値1~5
+        float dy = (float)(rnd.nextInt(10) + 1) * height_ratio; //y軸加速度の初期値1~5
         int color = texts.get(num).getColor();
-        float size = 20 + rnd.nextFloat() * 30;
+        float size = 20 + rnd.nextFloat() * texts.get(num).getSize() * width_ratio;
         String text = texts.get(num).getText();
         //字幕配列への追加
         credits.add(new Credits(drawX, drawY, dx, dy, color, size, text, getHeight()));
